@@ -1,26 +1,11 @@
+import sys
 from PIL import Image
 from numpy import asarray
 import numpy as np 
 import matplotlib.pyplot as plt
-
-img = Image.open('Sample.jpg')
-a = asarray(img)
-print(type(a))
-print(a.shape)
-
-# sobel kernels
-Gx = [[-1,0,1],
-      [-2,0,2],
-      [-1,0,1]]
-Gy = [[1,2,1],
-      [0,0,0],
-      [-1,-2,-1]]
-
-print(a[0][0][0])
-
 # rgb cus who gaf abt grayscale
 # also looping over all pixels is dumb and so i used vectorized numpy shit 
-def sobel_rgb(image):
+def sobel_rgb(image, Gx, Gy):
     h, w = len(image), len(image[0])
     print(f"{h} image {w}")
     
@@ -50,19 +35,48 @@ def sobel_rgb(image):
     
     return results.astype(np.uint8)
 
-edges = sobel_rgb(a)
+def main(args):
 
-fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+    img = Image.open('Sample.jpg')
+    a = asarray(img)
+    print(type(a))
+    print(a.shape)
 
-# OG
-axes[0].imshow(a)
-axes[0].set_title('Original Image')
-axes[0].axis('off')
+    # sobel kernels
+    Gx = [[-1,0,1],
+          [-2,0,2],
+         [-1,0,1]]
+    Gy = [[1,2,1],
+          [0,0,0],
+        [-1,-2,-1]]
 
-# EdGe(EG)
-axes[1].imshow(edges)
-axes[1].set_title('Sobel Edges (RGB)')
-axes[1].axis('off')
+    print(a[0][0][0])
 
-plt.tight_layout()
-plt.show()
+    if not (len(args) > 0):
+        print("defaulting to a sample image and sobel operator")
+    else:
+        try:
+            imgpath = args[0]
+            img = Image.open(imgpath)
+            a = asarray(img)
+        except Exception as e:
+            print(f"path dont work or summin {e}")
+            pass
+    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+    edges = sobel_rgb(a, Gx,Gy)
+    # OG
+    axes[0].imshow(a)
+    axes[0].set_title('Original Image')
+    axes[0].axis('off')
+
+    # EdGe(EG)
+    axes[1].imshow(edges)
+    axes[1].set_title('Sobel Edges (RGB)')
+    axes[1].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+if __name__ == '__main__':
+    args = sys.argv
+    main(args)
